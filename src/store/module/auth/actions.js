@@ -1,8 +1,10 @@
-import axios from 'axios';
+import axios from "../../../helper/axios"
 export default {
-    async login(context, payload) {
+    async login({
+        commit
+    }, payload) {
 
-        const response = await axios.post("https://todo-mvc-api-typeorm.herokuapp.com/auth/login", {
+        const response = await axios.post("/auth/login", {
             username: payload.username,
             password: payload.password,
 
@@ -11,35 +13,39 @@ export default {
         console.log(data);
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.id);
-        context.commit('setUser', {
+        commit('setUser', {
             token: data.token,
             userId: data.id,
         })
     },
     async signup(context, payload) {
-
-        const response = await axios.post("https://todo-mvc-api-typeorm.herokuapp.com/auth/register", {
+        // console.log(data);
+        const response = await axios.post("/auth/register", {
             username: payload.username,
             password: payload.password,
-
         });
-        const data = response.data;
-        console.log(data);
+
+        const dataRespon = response.data;
+        console.log(dataRespon);
     },
-    tryLogin(context) {
+    tryLogin({
+        commit
+    }) {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
         if (token && userId) {
-            context.commit('setUser', {
+            commit('setUser', {
                 token: token,
                 userId: userId
             });
         }
     },
-    logout(context) {
+    logout({
+        commit
+    }) {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
-        context.commit('setUser', {
+        commit('setUser', {
             token: null,
             userId: null,
         })

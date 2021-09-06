@@ -1,7 +1,7 @@
 <template>
   <teleport to="body">
     <div v-if="show" @click="tryClose" class="modal-overlay">
-      <transition name="dialog">
+      <transition>
         <dialog open v-if="show">
           <header>
             <slot name="header">
@@ -114,20 +114,20 @@ button:hover {
   background: #fff;
   color: #ae00ff;
 }
-.dialog-enter-from,
-.dialog-leave-to {
+.v-enter-from,
+.v-leave-to {
   opacity: 0;
   transform: scale(0.8);
 }
-.dialog-enter-active {
+.v-enter-active {
   transition: all 0.3s ease-out;
 }
-.dialog-leave-active {
+.v-leave-active {
   transition: all 0.3s ease-in;
 }
 
-.dialog-enter-to,
-.dialog-leave-from {
+.v-enter-to,
+.v-leave-from {
   opacity: 1;
   transform: scale(1);
 }

@@ -28,6 +28,8 @@
 import TodoItem from "../../components/todos/TodoItem.vue";
 import TodoFilter from "../../components/todos/TodoFilter.vue";
 import TodoHeader from "../../components/todos/TodoHeader.vue";
+import { mapState } from "vuex";
+import { mapActions } from "vuex";
 export default {
   components: {
     TodoItem,
@@ -40,13 +42,13 @@ export default {
       statusFilter: "all",
     };
   },
-  created() {
+  mounted() {
     this.loadTodos();
   },
   computed: {
-    isTodo() {
-      return this.$store.getters["todos/todos"];
-    },
+    ...mapState({
+      isTodo: (state) => state.todos.todos,
+    }),
     filterByStatus() {
       switch (this.statusFilter) {
         case "active":
@@ -59,14 +61,15 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      fetchTodos: "todos/fetchTodos",
+    }),
     setFilter(updateFilter) {
       this.statusFilter = updateFilter;
     },
-    async loadTodos(refresh = false) {
+    async loadTodos() {
       try {
-        await this.$store.dispatch("todos/fetchTodos", {
-          forceRefresh: refresh,
-        });
+        await this.fetchTodos(1);
       } catch (error) {
         this.error = error.message || "Something went wrong!";
       }

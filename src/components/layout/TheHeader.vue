@@ -11,7 +11,7 @@
           >
         </li>
         <li v-else>
-          <button @click="logout" class="btnlogout">
+          <button @click="handleLogout" class="btnlogout">
             <i class="fas fa-sign-out-alt"></i> Logout
           </button>
         </li>
@@ -20,15 +20,23 @@
   </header>
 </template>
 <script>
+import { mapActions } from "vuex";
+import { mapState } from "vuex";
 export default {
   computed: {
+    ...mapState({
+      isAuthenticated: (state) => state.auth.token,
+    }),
     isLoggedIn() {
-      return this.$store.getters.isAuthenticated;
+      return !!this.isAuthenticated;
     },
   },
   methods: {
-    logout() {
-      this.$store.dispatch("logout");
+    ...mapActions({
+      logout: "auth/logout",
+    }),
+    handleLogout() {
+      this.logout();
       this.$router.replace("/auth");
     },
   },

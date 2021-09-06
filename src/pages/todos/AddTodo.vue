@@ -25,6 +25,7 @@
   </div>
 </template>
 <script>
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -38,6 +39,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      addTodo: "todos/addTodo",
+    }),
     validationForm() {
       if (this.content.val === "") {
         this.content.isValid = false;
@@ -52,8 +56,8 @@ export default {
       console.log("gg");
       this.isLoading = true;
       try {
-        this.$store.dispatch("todos/addTodo", this.content.val);
-        this.$router.replace("/todos");
+        this.addTodo(this.content.val);
+        this.$router.push("/todos");
       } catch (err) {
         this.error = "Fail to add! Try again later.";
       }

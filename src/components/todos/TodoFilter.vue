@@ -47,11 +47,6 @@ export default {
   computed: {
     numTodosComplete() {
       return this.$store.getters["todos/doneTodos"].length;
-      // const todos = this.$store.getters["todos/todos"];
-      // console.log(todos);
-      // const todosCompleted = todos.filter((todo) => todo.status === "active");
-      // return todosCompleted.length;
-      // return this.$store.state.todos.filter(todo => todo.done).length
     },
   },
   methods: {

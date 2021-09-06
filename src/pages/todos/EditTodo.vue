@@ -6,11 +6,7 @@
         <p class="error" v-if="error">{{ error }}</p>
         <div class="control">
           <label for="content" class="label"> Content: </label>
-          <textarea
-            name="content"
-            v-model="selectedTodo.content"
-            autofocus
-          ></textarea>
+          <textarea name="content" v-model="updateContent" autofocus></textarea>
         </div>
         <div class="action">
           <button type="submit" class="btn btnsubmit">Edit</button>
@@ -23,6 +19,8 @@
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+import { mapActions } from "vuex";
 export default {
   props: ["id"],
   data() {
@@ -31,11 +29,15 @@ export default {
       isFormValid: true,
       error: null,
       selectedTodo: null,
+      updateContent: "",
     };
   },
   methods: {
+    ...mapActions({
+      updateTodo: "todos/updateTodo",
+    }),
     validationForm() {
-      if (this.selectedTodo.content === "") {
+      if (this.updateContent === "") {
         this.error = "Enter new content!";
         this.isFormValid = false;
       }
@@ -47,7 +49,12 @@ export default {
       }
       this.isLoading = true;
       try {
-        this.$store.dispatch("todos/updateTodo", this.selectedTodo);
+        const data = {
+          content: this.updateContent,
+          status: this.selectedTodo.status,
+          id: this.id,
+        };
+        this.updateTodo(data);
         this.$router.replace("/todos");
       } catch (err) {
         this.error = "Fail to add! Try again later.";
@@ -56,15 +63,13 @@ export default {
     },
   },
   computed: {
-    getcontent() {
-      return this.selectedTodo.content;
-    },
+    ...mapState({
+      isTodo: (state) => state.todos.todos,
+    }),
   },
   created() {
-    this.selectedTodo = this.$store.getters["todos/todos"].find(
-      (todo) => todo.id === this.id
-    );
-    console.log(this.selectedTodo.content);
+    this.selectedTodo = this.isTodo.find((todo) => todo.id === this.id);
+    this.updateContent = this.selectedTodo.content;
   },
 };
 </script>

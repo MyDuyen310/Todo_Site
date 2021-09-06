@@ -1,80 +1,75 @@
-import axios from 'axios';
-import queryString from 'query-string';
-const url = "https://todo-mvc-api-typeorm.herokuapp.com/api/todos";
+import axios from "../../../helper/axios"
+
 export default {
-    async fetchTodos(context) {
-        const token = context.rootGetters.token;
-        axios.defaults.headers = {
-            "content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.get(url, {
-            params: {
-                page: 1,
-                limit: 10
-            },
-            paramsSerializer: (params) => queryString.stringify(params),
-        });
-        const responseData = response.data.items;
-        const todos = [];
-        for (const key in responseData) {
-            const todo = {
-                id: responseData[key].id,
-                content: responseData[key].content,
-                status: responseData[key].status,
-                createdAt: responseData[key].created_at
-            };
-            todos.push(todo);
+    async fetchTodos({
+        commit
+    }, page) {
+        try {
+            const response = await axios.get("/api/todos", {
+                params: {
+                    page,
+                    limit: 10
+                },
+            });
+
+            const responseData = response.data.items;
+            console.log(response);
+            const todos = [];
+            for (const data of responseData) {
+                todos.push({
+                    id: data.id,
+                    content: data.content,
+                    status: data.status,
+                    createdAt: data.created_at
+                });
+            }
+            commit('setTodos', todos);
+        } catch (error) {
+            console.log(error)
         }
-        context.commit('setTodos', todos);
+
     },
-    async addTodo(context, data) {
-        const token = context.rootGetters.token;
-        axios.defaults.headers = {
-            "content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-        };
-        const todoData = {
-            content: data,
-        };
-        const response = await axios.post(url, todoData);
-        console.log(response);
-        const todo = {
-            id: response.data.id,
-            content: response.data.content,
-            status: response.data.status,
-            createdAt: response.data.created_at
-        };
-        context.commit('addTodos', todo);
+    async addTodo({
+        commit
+    }, data) {
+        try {
+            const response = await axios.post("/api/todos", {
+                content: data,
+            });
+            const todo = {
+                id: response.data.id,
+                content: response.data.content,
+                status: response.data.status,
+                createdAt: response.data.created_at
+            };
+            commit('addTodos', todo);
+        } catch (error) {
+            console.log(error);
+        }
     },
-    async updateTodo(context, data) {
-        const token = context.rootGetters.token;
-        axios.defaults.headers = {
-            "content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-        };
+    async updateTodo({
+        commit
+    }, data) {
         const todoData = {
             content: data.content,
             status: data.status,
         };
-        const response = await axios.put(url + "/" + data.id, todoData);
-        console.log(response);
+        const response = await axios.put("/api/todos/" + data.id,
+            todoData
+        );
         const todo = {
             id: response.data.id,
             content: response.data.content,
             status: response.data.status,
             createdAt: response.data.updated_at
         };
-        context.commit('updateTodo', todo);
+        commit('updateTodo', todo);
     },
-    async removeTodo(context, id) {
-        const token = context.rootGetters.token;
-        axios.defaults.headers = {
-            "content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.delete(url + "/" + id);
+    async removeTodo({
+        commit
+    }, id) {
+        const response = await axios.delete("/api/todos/" + id);
         console.log(response);
-        context.commit('deleteTodo', id);
+        commit('deleteTodo', id);
     }
 };

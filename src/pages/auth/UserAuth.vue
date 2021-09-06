@@ -28,7 +28,7 @@
               @blur="clearValidity('password')"
             />
             <p class="error" v-if="!password.isValid">
-              Password must have more than 8 characters!
+              Password must have more than 8 character!
             </p>
           </div>
           <div class="action">
@@ -45,7 +45,13 @@
   </div>
 </template>
 <script>
+// function isValidPass(password) {
+//   const regexPass = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$";
+//   return regexPass.test(password);
+// }
 import BaseModal from "../../components/ui/BaseModal.vue";
+import { mapState } from "vuex";
+import { mapActions } from "vuex";
 export default {
   components: { BaseModal },
   data() {
@@ -65,6 +71,9 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      token: (state) => state.auth.token,
+    }),
     submitButtonCaption() {
       if (this.mode === "login") {
         return "Login";
@@ -81,6 +90,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      login: "auth/login",
+      signup: "auth/signup",
+    }),
     clearValidity(input) {
       this[input].isValid = true;
     },
@@ -89,7 +102,7 @@ export default {
         this.username.isValid = false;
         this.isFormValid = false;
       }
-      if (this.password.val.length < 8) {
+      if (!this.validPassword(this.password.val)) {
         this.password.isValid = false;
         this.isFormValid = false;
       }
@@ -104,14 +117,16 @@ export default {
         username: this.username.val,
         password: this.password.val,
       };
+      console.log(actionPayload);
       try {
         if (this.mode === "login") {
-          await this.$store.dispatch("login", actionPayload);
+          await this.login(actionPayload);
         } else {
-          await this.$store.dispatch("signup", actionPayload);
+          await this.signup(actionPayload);
           this.mode = "login";
         }
-        this.$router.replace("/todos");
+        console.log("123", this.token);
+        this.$router.push("/todos");
       } catch (err) {
         this.error = "Something went wrong! Try again later.";
       }
@@ -126,6 +141,10 @@ export default {
     },
     handleError() {
       this.error = null;
+    },
+    validPassword: function (password) {
+      const regexPass = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      return regexPass.test(password);
     },
   },
 };

@@ -49,9 +49,11 @@ const router = createRouter({
     ]
 });
 router.beforeEach(function (to, _, next) {
-    if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+    const isAuthenticated = !!store.state.auth.token
+
+    if (to.meta.requiresAuth && !isAuthenticated) {
         next('/auth');
-    } else if (to.meta.requiresUnauth && store.getters.isAuthenticated) {
+    } else if (to.meta.requiresUnauth && isAuthenticated) {
         next('/todos')
     } else {
         next();

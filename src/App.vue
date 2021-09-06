@@ -5,10 +5,16 @@
 
 <script>
 import TheHeader from "./components/layout/TheHeader.vue";
+import { mapActions } from "vuex";
 export default {
   components: { TheHeader },
   created() {
-    this.$store.dispatch("tryLogin");
+    this.tryLogin();
+  },
+  methods: {
+    ...mapActions({
+      tryLogin: "auth/tryLogin",
+    }),
   },
 };
 </script>
